@@ -1,0 +1,8 @@
+[package]
+author = "Jay Kickliter <jay@kickliter.com>"
+edition = "2021"
+name = "dsprs"
+version = "0.1.0"
+
+[dependencies]
+num-traits = "0.2"
