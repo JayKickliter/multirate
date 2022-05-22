@@ -6,7 +6,7 @@ pub struct Queue<T> {
     buf: Vec<T>,
 }
 
-impl<T: Zero + Clone> Queue<T> {
+impl<T: Zero> Queue<T> {
     ///
     /// # Panics
     /// Panics if `cap == 0`
@@ -14,7 +14,9 @@ impl<T: Zero + Clone> Queue<T> {
         assert!(capacity > 0);
         Self {
             head: 0,
-            buf: vec![T::zero(); capacity],
+            buf: std::iter::repeat_with(|| T::zero())
+                .take(capacity)
+                .collect(),
         }
     }
 }
