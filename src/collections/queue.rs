@@ -11,7 +11,7 @@ impl<T: Zero> Queue<T> {
     /// # Panics
     /// Panics if `cap == 0`
     pub fn with_capacity(capacity: usize) -> Self {
-        assert!(capacity > 0);
+        assert!(capacity > 0, "0-sized queue makes little sense?");
         Self {
             head: 0,
             buf: std::iter::repeat_with(|| T::zero())
@@ -47,6 +47,12 @@ impl<T> Queue<T> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    #[should_panic]
+    fn empty_queue_panics() {
+        Queue::<i32>::with_capacity(0);
+    }
 
     #[test]
     fn basic_usage() {
