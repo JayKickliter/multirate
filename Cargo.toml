@@ -1,8 +1,12 @@
 [package]
-author = "Jay Kickliter <jay@kickliter.com>"
 edition = "2021"
 name = "dsprs"
 version = "0.1.0"
+authors = ["Jay Kickliter <jay@kickliter.com>"]
+
+[profile.release]
+debug = true
 
 [dependencies]
+multiversion = "0.6"
 num-traits = "0.2"
