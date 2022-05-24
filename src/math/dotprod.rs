@@ -2,8 +2,7 @@
 use multiversion::multiversion;
 use num_traits::Zero;
 
-// Computing the XOR of two byte slices, `lhs` & `rhs`.
-// `lhs` is mutated in-place with the result
+/// Computes the dot-product of two slices `a` and `b`.
 #[multiversion]
 #[clone(target = "[arm,aarch64]+neon")]
 #[clone(target = "x86+sse")]
