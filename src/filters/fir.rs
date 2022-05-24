@@ -3,6 +3,10 @@ use core::ops::Mul;
 use num_traits::Zero;
 
 /// A stateful, streaming, FIR filter.
+///
+/// $$
+/// y\[n\] = \sum^{N-1}_{k=0} h\[k\] x\[N-k-1\]
+/// $$
 pub struct FIR<H, X> {
     /// Filter taps stored in reverse-order.
     h: Box<[H]>,

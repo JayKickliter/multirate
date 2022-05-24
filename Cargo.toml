@@ -4,6 +4,9 @@ name = "dsprs"
 version = "0.1.0"
 authors = ["Jay Kickliter <jay@kickliter.com>"]
 
+[package.metadata.docs.rs]
+rustdoc-args = [ "--html-in-header", "katex-header.html" ]
+
 [profile.release]
 debug = true
 
