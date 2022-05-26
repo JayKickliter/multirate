@@ -1,8 +1,9 @@
+use crate::math::Diff;
 use num_traits::Zero;
-use std::num::NonZeroUsize;
+use std::{num::NonZeroUsize, ops::Sub};
 
 /// A polyphase filterbank capable of returning any arbitrary sub-filter.
-#[repr(transparent)]
+#[derive(Clone, Debug)]
 pub struct PFB<H>(Box<[Box<[H]>]>);
 
 impl<H: Clone + Zero> PFB<H> {
@@ -14,6 +15,28 @@ impl<H: Clone + Zero> PFB<H> {
 impl<H> PFB<H> {
     pub fn dims(&self) -> (usize, usize) {
         (self.0.len(), self.0[0].len())
+    }
+}
+
+impl<H: Copy + Sub<Output = H>> Diff for &PFB<H> {
+    type Output = PFB<H>;
+
+    fn diff(self) -> PFB<H> {
+        let mut pfb = self.clone();
+        assert!(pfb.0.len() > 1);
+        let phases = pfb.0.len();
+        let phase_len = pfb.0[0].len();
+        for (prev_phase_idx, phase_idx) in std::iter::once(phases - 1)
+            .chain(0..phases - 1)
+            .zip(0..phases)
+        {
+            for j in 0..phase_len {
+                let p = self.0[prev_phase_idx][j];
+                let c = self.0[phase_idx][j];
+                pfb.0[phase_idx][j] = c - p;
+            }
+        }
+        pfb
     }
 }
 
@@ -51,6 +74,7 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
+
     #[test]
     fn test_decompose() {
         let h: Vec<i32> = (0..11).into_iter().collect();
@@ -65,5 +89,14 @@ mod tests {
             ]
             .into_boxed_slice()
         );
+    }
+
+    #[test]
+    fn test_diff() {
+        let h: Vec<i32> = (0..12).into_iter().collect();
+        let pfb = PFB::with_taps(&h, NonZeroUsize::new(4).unwrap());
+        let dpfb = pfb.diff();
+        println!("{:?}", pfb);
+        println!("{:?}", dpfb);
     }
 }
