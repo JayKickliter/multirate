@@ -34,7 +34,6 @@ where
         0 => 0,
         r => n - r,
     };
-    println!("{}+{}->{}", h.len(), padding, h.len() + padding);
 
     (0..n)
         .into_iter()
