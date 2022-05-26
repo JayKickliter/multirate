@@ -43,8 +43,7 @@ where
                 .cloned()
                 .skip(ni)
                 .step_by(n)
-                .collect::<Vec<H>>()
-                .into_boxed_slice()
+                .collect::<Box<[H]>>()
         })
         .collect::<Box<[Box<[H]>]>>()
 }
