@@ -9,15 +9,15 @@ use std::{num::NonZeroUsize, ops::Sub};
 #[derive(Clone, Debug)]
 pub struct Arb<H, X> {
     /// Base filterbank.
-    pfb: PFB<H>,
+    _pfb: PFB<H>,
     /// Derivative filterbank.
-    dpfb: PFB<H>,
+    _dpfb: PFB<H>,
     /// Previous input samples.
-    history: Queue<X>,
+    _history: Queue<X>,
     /// Resample rate.
-    resamp_rate: f64,
+    _resamp_rate: f64,
     /// Current phase.
-    phase: f64,
+    _phase: f64,
 }
 
 impl<H, X> Arb<H, X>
@@ -26,17 +26,17 @@ where
     X: Zero,
 {
     /// Create a new resampler with provied taps split into `n` subfilters.
-    pub fn with_taps(h: &[H], n: NonZeroUsize, resamp_rate: f64) -> Self {
-        let pfb = PFB::with_taps(h, n);
-        let dh: Vec<H> = diff(h).collect();
-        let dpfb = PFB::with_taps(&dh, n);
-        let history = Queue::with_capacity(pfb.dims().1);
+    pub fn with_taps(h: &[H], n: NonZeroUsize, _resamp_rate: f64) -> Self {
+        let _pfb = PFB::with_taps(h, n);
+        let _dh: Vec<H> = diff(h).collect();
+        let _dpfb = PFB::with_taps(&_dh, n);
+        let _history = Queue::with_capacity(_pfb.dims().1);
         Self {
-            pfb,
-            dpfb,
-            history,
-            resamp_rate,
-            phase: 0.0,
+            _pfb,
+            _dpfb,
+            _history,
+            _resamp_rate,
+            _phase: 0.0,
         }
     }
 }
