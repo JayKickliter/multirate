@@ -11,5 +11,6 @@ rustdoc-args = [ "--html-in-header", "katex-header.html" ]
 debug = true
 
 [dependencies]
+itertools = "0.10"
 multiversion = "0.6"
 num-traits = "0.2"

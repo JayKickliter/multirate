@@ -1,6 +1,7 @@
 use num_traits::Zero;
 
 /// A fixed-size circular buffer/queue.
+#[derive(Clone, Debug)]
 pub struct Queue<T> {
     head: usize,
     buf: Vec<T>,
