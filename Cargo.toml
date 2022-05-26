@@ -1,6 +1,6 @@
 [package]
 edition = "2021"
-name = "dsprs"
+name = "multirate"
 version = "0.1.0"
 authors = ["Jay Kickliter <jay@kickliter.com>"]
 
