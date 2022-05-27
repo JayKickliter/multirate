@@ -1,6 +1,7 @@
 use num_traits::Zero;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
+use std::ops::Index;
 
 /// A polyphase filterbank capable of returning any arbitrary sub-filter.
 #[derive(Clone, Debug)]
@@ -21,6 +22,18 @@ impl<H> PFB<H> {
 impl<H> PFB<H> {
     pub fn dims(&self) -> (usize, usize) {
         (self.0.len(), self.0[0].len())
+    }
+}
+
+impl<H> Index<usize> for PFB<H> {
+    type Output = [H];
+    fn index(&self, index: usize) -> &[H] {
+        let index = if index < self.0.len() {
+            index
+        } else {
+            index % self.0.len()
+        };
+        &self.0[index]
     }
 }
 
@@ -80,5 +93,16 @@ mod tests {
             ]
             .into_boxed_slice()
         );
+    }
+
+    #[test]
+    fn test_index() {
+        let h: Vec<i32> = (0..11).into_iter().collect();
+        let pfb = PFB::with_taps(&h, 4);
+        assert_eq!(pfb[0], [0, 4, 8]);
+        assert_eq!(pfb[1], [1, 5, 9]);
+        assert_eq!(pfb[2], [2, 6, 10]);
+        assert_eq!(pfb[3], [3, 7, 0]);
+        assert_eq!(pfb[4], [0, 4, 8]);
     }
 }
