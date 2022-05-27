@@ -3,10 +3,13 @@ use crate::{
     math::diff,
 };
 use num_traits::Zero;
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
 use std::{num::NonZeroUsize, ops::Sub};
 
 /// A FIR filter capable of resamping at non-rational rates.
 #[derive(Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Arb<H, X> {
     /// Base filterbank.
     _pfb: PFB<H>,

@@ -1,7 +1,10 @@
 use num_traits::Zero;
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
 
 /// A fixed-size circular buffer/queue.
 #[derive(Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Queue<T> {
     head: usize,
     buf: Vec<T>,

@@ -1,8 +1,11 @@
 use num_traits::Zero;
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
 use std::num::NonZeroUsize;
 
 /// A polyphase filterbank capable of returning any arbitrary sub-filter.
 #[derive(Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct PFB<H>(Box<[Box<[H]>]>);
 
 impl<H> PFB<H> {
