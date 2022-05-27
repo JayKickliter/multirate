@@ -5,8 +5,13 @@ use std::num::NonZeroUsize;
 #[derive(Clone, Debug)]
 pub struct PFB<H>(Box<[Box<[H]>]>);
 
-impl<H: Clone + Zero> PFB<H> {
-    pub fn with_taps(h: &[H], n: NonZeroUsize) -> Self {
+impl<H> PFB<H> {
+    pub fn with_taps<'a, I>(h: I, n: NonZeroUsize) -> Self
+    where
+        H: Clone + Zero + 'a,
+        I: IntoIterator<Item = &'a H> + Clone + 'a,
+        <I as IntoIterator>::IntoIter: ExactSizeIterator,
+    {
         Self(decompose(h, n))
     }
 }
@@ -25,12 +30,14 @@ impl<H> PFB<H> {
 /// [Polyphase Filters](http://www.ws.binghamton.edu/fowler/fowler%20personal%20page/EE521_files/IV-05%20Polyphase%20FIlters%20Revised.pdf)
 ///
 /// [LiquidDSP](https://github.com/jgaeddert/liquid-dsp/blob/b10acc5ab86480ccff4a0743702a082c4fafb4b7/src/filter/src/firpfb.proto.c)
-pub fn decompose<H>(h: &[H], n: NonZeroUsize) -> Box<[Box<[H]>]>
+pub fn decompose<'a, H: 'a, I>(h: I, n: NonZeroUsize) -> Box<[Box<[H]>]>
 where
+    I: IntoIterator<Item = &'a H> + Clone + 'a,
+    <I as IntoIterator>::IntoIter: ExactSizeIterator,
     H: Clone + Zero,
 {
     let n = n.into();
-    let padding = match h.len() % n {
+    let padding = match h.clone().into_iter().len() % n {
         0 => 0,
         r => n - r,
     };
@@ -38,9 +45,10 @@ where
     (0..n)
         .into_iter()
         .map(|ni| {
-            h.iter()
-                .chain(std::iter::repeat(&H::zero()).take(padding))
+            h.clone()
+                .into_iter()
                 .cloned()
+                .chain(std::iter::repeat(H::zero()).take(padding))
                 .skip(ni)
                 .step_by(n)
                 .collect::<Box<[H]>>()
