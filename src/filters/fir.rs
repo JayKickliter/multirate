@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 /// y\[n\] = \sum^{N-1}_{k=0} h\[k\] x\[N-k-1\]
 /// $$
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-pub struct FIR<H, X> {
+pub struct FIR<H, X = H> {
     /// Filter taps stored in reverse-order.
     h: Box<[H]>,
     /// Previous input samples.
@@ -56,14 +56,14 @@ mod tests {
     #[test]
     fn test_fir_create() {
         let taps = &[1.0_f32, 2.0, 3.0];
-        let filt: FIR<f32, f32> = FIR::with_taps(taps);
+        let filt: FIR<f32> = FIR::with_taps(taps);
         assert_eq!(filt.h(), &[3.0_f32, 2.0, 1.0]);
     }
 
     #[test]
     fn test_fir_exec() {
         let taps = &[1, 2, 3];
-        let mut filt: FIR<i32, i32> = FIR::with_taps(taps);
+        let mut filt = FIR::with_taps(taps);
         let xs = &[1, 0, 0, 0];
         let ys: Vec<i32> = xs.iter().map(|x| filt.exec(*x)).collect();
         assert_eq!(ys, [1, 2, 3, 0]);

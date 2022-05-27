@@ -5,12 +5,12 @@ use crate::{
 use num_traits::Zero;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
-use std::{num::NonZeroUsize, ops::Sub};
+use std::ops::Sub;
 
 /// A FIR filter capable of resamping at non-rational rates.
 #[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-pub struct Arb<H, X> {
+pub struct Arb<H, X = H> {
     /// Base filterbank.
     _pfb: PFB<H>,
     /// Derivative filterbank.
@@ -29,7 +29,11 @@ where
     X: Zero,
 {
     /// Create a new resampler with provied taps split into `n` subfilters.
-    pub fn with_taps(h: &[H], n: NonZeroUsize, _resamp_rate: f64) -> Self {
+    ///
+    /// # Panics
+    ///
+    /// Will panic if `n < 2`
+    pub fn with_taps(h: &[H], n: usize, _resamp_rate: f64) -> Self {
         let _pfb = PFB::with_taps(h, n);
         let _dh: Vec<H> = diff(h).collect();
         let _dpfb = PFB::with_taps(&_dh, n);
@@ -51,6 +55,6 @@ mod tests {
     #[test]
     fn test_with_taps() {
         let h: Vec<i32> = (0..12).into_iter().collect();
-        let _resampler: Arb<_, i32> = Arb::with_taps(&h, NonZeroUsize::new(4).unwrap(), 0.5);
+        let _resampler: Arb<i32> = Arb::with_taps(&h, 4, 0.5);
     }
 }

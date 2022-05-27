@@ -13,7 +13,8 @@ pub struct Queue<T> {
 impl<T: Zero> Queue<T> {
     ///
     /// # Panics
-    /// Panics if `cap == 0`
+    ///
+    /// Panics if `cap < 1`
     pub fn with_capacity(capacity: usize) -> Self {
         assert!(capacity > 0, "0-sized queue makes little sense?");
         Self {
