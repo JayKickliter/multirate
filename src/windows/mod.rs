@@ -17,7 +17,7 @@ where
     H: From<f64>,
 {
     fn tap(&self, n: usize, ns: usize) -> H {
-        (0.53836 - 0.46164 * f64::cos((2.0 * PI64 * n as f64) / (ns as f64 - 1.0))).into()
+        (0.54 - 0.46 * f64::cos((2.0 * PI64 * n as f64) / (ns as f64 - 1.0))).into()
     }
 }
 
@@ -52,5 +52,29 @@ where
 
     fn next(&mut self) -> Option<H> {
         unimplemented!()
+    }
+}
+
+#[cfg(test)]
+mod trests {
+    use super::*;
+    use approx::assert_relative_eq;
+
+    #[test]
+    fn test_hamming() {
+        // Generated from Julia using `DSP.hamming(9)`
+        let expected = [
+            0.08000000000000002,
+            0.21473088065418822,
+            0.54,
+            0.865269119345812,
+            1.0,
+            0.865269119345812,
+            0.54,
+            0.21473088065418822,
+            0.08000000000000002,
+        ];
+        let taps: Vec<f64> = (0..9).into_iter().map(|n| Hamming.tap(n, 9)).collect();
+        assert_relative_eq!(taps.as_slice(), expected.as_slice());
     }
 }
