@@ -3,6 +3,7 @@ edition = "2021"
 name = "multirate"
 version = "0.1.0"
 authors = ["Jay Kickliter <jay@kickliter.com>"]
+license = "MIT OR Apache-2.0"
 
 [package.metadata.docs.rs]
 rustdoc-args = [ "--html-in-header", "katex-header.html" ]
