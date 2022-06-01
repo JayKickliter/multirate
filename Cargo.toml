@@ -1,16 +1,21 @@
 [package]
-edition = "2021"
-name = "multirate"
-version = "0.1.0"
 authors = ["Jay Kickliter <jay@kickliter.com>"]
+categories = [ "science" ]
+description = "Multirate digital signal proccessing (DSP) components."
+edition = "2021"
+exclude = [ "/.github/*" ]
+keywords = [ "dsp", "science" ]
 license = "MIT OR Apache-2.0"
+name = "multirate"
+repository = "https://github.com/JayKickliter/multirate"
+version = "0.0.0"
 
 [package.metadata.docs.rs]
 rustdoc-args = [ "--html-in-header", "katex-header.html" ]
 
 [features]
 default = []
-serde-support = [ "serde" ]
+serde = [ "serde/derive" ]
 
 [profile.release]
 debug = true
@@ -19,7 +24,7 @@ debug = true
 itertools = "0.10"
 multiversion = "0.6"
 num-traits = "0.2"
-serde = { version = "1", optional = true, features = [ "derive" ] }
+serde = { version = "1", optional = true }
 
 [dev-dependencies]
 approx = "0.5"
