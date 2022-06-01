@@ -1,11 +1,11 @@
 use num_traits::Zero;
-#[cfg(feature = "serde")]
+#[cfg(feature = "serde-derive")]
 use serde::{Deserialize, Serialize};
 use std::ops::Index;
 
 /// A polyphase filterbank capable of returning any arbitrary sub-filter.
-#[derive(Clone, Debug)]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[derive(Clone, Debug, PartialEq)]
+#[cfg_attr(feature = "serde-derive", derive(Serialize, Deserialize))]
 pub struct PFB<H>(Box<[Box<[H]>]>);
 
 impl<H> PFB<H> {
@@ -104,5 +104,16 @@ mod tests {
         assert_eq!(pfb[2], [2, 6, 10]);
         assert_eq!(pfb[3], [3, 7, 0]);
         assert_eq!(pfb[4], [0, 4, 8]);
+    }
+
+    #[test]
+    #[cfg(feature = "serde-derive")]
+    fn test_serde() {
+        use bincode;
+        let h: Vec<i32> = (0..11).into_iter().collect();
+        let pfb = PFB::with_taps(&h, 4);
+        let encoded = bincode::serialize(&pfb).unwrap();
+        let decoded: PFB<i32> = bincode::deserialize(&encoded[..]).unwrap();
+        assert_eq!(pfb, decoded);
     }
 }

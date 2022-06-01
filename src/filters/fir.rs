@@ -1,7 +1,7 @@
 use crate::{collections::queue::Queue, math::dotprod::dot};
 use core::ops::Mul;
 use num_traits::Zero;
-#[cfg(feature = "serde")]
+#[cfg(feature = "serde-derive")]
 use serde::{Deserialize, Serialize};
 
 /// A stateful, streaming, FIR filter.
@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 /// y\[n\] = \sum^{N-1}_{k=0} h\[k\] x\[N-k-1\]
 /// $$
 #[derive(Clone, Debug)]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde-derive", derive(Serialize, Deserialize))]
 pub struct FIR<H, X = H> {
     /// Filter taps stored in reverse-order.
     h: Box<[H]>,
