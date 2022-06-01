@@ -1,9 +1,16 @@
-use num_traits::Float;
 use std::f64::consts::PI as PI64;
 use std::marker::PhantomData;
 
-pub trait Window<H> {
+pub trait Window<H>: Sized {
     fn tap(&self, n: usize, ns: usize) -> H;
+    fn taps(self, ns: usize) -> Iter<Self, H> {
+        Iter {
+            window: self,
+            n: 0,
+            ns,
+            _tap: PhantomData,
+        }
+    }
 }
 
 /// $$
@@ -51,7 +58,13 @@ where
     type Item = H;
 
     fn next(&mut self) -> Option<H> {
-        unimplemented!()
+        if self.n < self.ns {
+            let res = Some(self.window.tap(self.n, self.ns));
+            self.n += 1;
+            res
+        } else {
+            None
+        }
     }
 }
 
@@ -74,7 +87,7 @@ mod trests {
             0.21473088065418822,
             0.08000000000000002,
         ];
-        let taps: Vec<f64> = (0..9).into_iter().map(|n| Hamming.tap(n, 9)).collect();
+        let taps: Vec<f64> = Hamming.taps(9).collect();
         assert_relative_eq!(taps.as_slice(), expected.as_slice());
     }
 }
