@@ -1,5 +1,6 @@
-use std::f64::consts::PI as PI64;
-use std::marker::PhantomData;
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
+use std::{f64::consts::PI as PI64, marker::PhantomData};
 
 pub trait Window<H>: Sized {
     fn tap(&self, n: usize, ns: usize) -> H;
@@ -17,6 +18,7 @@ pub trait Window<H>: Sized {
 /// w\[n\] = 0.53836−0.46164 \cos \left( \frac{2\pi n}{N-1} \right)
 /// $$
 #[derive(Copy, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Hamming;
 
 impl<H> Window<H> for Hamming
@@ -32,6 +34,7 @@ where
 /// w\[n\] = 0.5−0.5 \cos \left( \frac{2\pi n}{N-1} \right)
 /// $$
 #[derive(Copy, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Hann;
 
 impl<H> Window<H> for Hann

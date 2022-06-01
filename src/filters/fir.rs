@@ -9,6 +9,7 @@ use serde::{Deserialize, Serialize};
 /// $$
 /// y\[n\] = \sum^{N-1}_{k=0} h\[k\] x\[N-k-1\]
 /// $$
+#[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct FIR<H, X = H> {
     /// Filter taps stored in reverse-order.
