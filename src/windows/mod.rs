@@ -1,10 +1,13 @@
+use num_traits::AsPrimitive;
 #[cfg(feature = "serde-derive")]
 use serde::{Deserialize, Serialize};
 use std::{f64::consts::PI as PI64, marker::PhantomData};
 
-pub trait Window<H>: Sized {
-    fn tap(&self, n: usize, ns: usize) -> H;
-    fn taps(self, ns: usize) -> Iter<Self, H> {
+pub trait Window: Sized {
+    fn tap<H: Copy + 'static>(&self, n: usize, ns: usize) -> H
+    where
+        f64: AsPrimitive<H>;
+    fn taps<H>(self, ns: usize) -> Iter<Self, H> {
         Iter {
             window: self,
             n: 0,
@@ -21,12 +24,13 @@ pub trait Window<H>: Sized {
 #[cfg_attr(feature = "serde-derive", derive(Serialize, Deserialize))]
 pub struct Hamming;
 
-impl<H> Window<H> for Hamming
-where
-    H: From<f64>,
-{
-    fn tap(&self, n: usize, ns: usize) -> H {
-        (0.54 - 0.46 * f64::cos((2.0 * PI64 * n as f64) / (ns as f64 - 1.0))).into()
+impl Window for Hamming {
+    fn tap<H>(&self, n: usize, ns: usize) -> H
+    where
+        f64: AsPrimitive<H>,
+        H: Copy + 'static,
+    {
+        (0.54 - 0.46 * f64::cos((2.0 * PI64 * n as f64) / (ns as f64 - 1.0))).as_()
     }
 }
 
@@ -37,12 +41,13 @@ where
 #[cfg_attr(feature = "serde-derive", derive(Serialize, Deserialize))]
 pub struct Hann;
 
-impl<H> Window<H> for Hann
-where
-    H: From<f64>,
-{
-    fn tap(&self, n: usize, ns: usize) -> H {
-        (0.5 - 0.5 * f64::cos((2.0 * PI64 * n as f64) / (ns as f64 - 1.0))).into()
+impl Window for Hann {
+    fn tap<H>(&self, n: usize, ns: usize) -> H
+    where
+        f64: AsPrimitive<H>,
+        H: Copy + 'static,
+    {
+        (0.5 - 0.5 * f64::cos((2.0 * PI64 * n as f64) / (ns as f64 - 1.0))).as_()
     }
 }
 
@@ -56,7 +61,9 @@ pub struct Iter<W, H> {
 
 impl<W, H> Iterator for Iter<W, H>
 where
-    W: Window<H>,
+    W: Window,
+    H: Copy + 'static,
+    f64: AsPrimitive<H>,
 {
     type Item = H;
 
@@ -77,7 +84,25 @@ mod trests {
     use approx::assert_relative_eq;
 
     #[test]
-    fn test_hamming() {
+    fn test_hamming_f32() {
+        // Generated from Julia using `DSP.hamming(9)`
+        let expected = [
+            0.08000000000000002,
+            0.21473088065418822,
+            0.54,
+            0.865269119345812,
+            1.0,
+            0.865269119345812,
+            0.54,
+            0.21473088065418822,
+            0.08000000000000002,
+        ];
+        let taps: Vec<f32> = Hamming.taps(9).collect();
+        assert_relative_eq!(taps.as_slice(), expected.as_slice());
+    }
+
+    #[test]
+    fn test_hamming_f64() {
         // Generated from Julia using `DSP.hamming(9)`
         let expected = [
             0.08000000000000002,
