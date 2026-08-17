@@ -54,7 +54,7 @@ mod tests {
 
     #[test]
     fn test_with_taps() {
-        let h: Vec<i32> = (0..12).into_iter().collect();
+        let h: Vec<i32> = (0..12).collect();
         let _resampler: Arb<i32> = Arb::with_taps(&h, 4, 0.5);
     }
 }

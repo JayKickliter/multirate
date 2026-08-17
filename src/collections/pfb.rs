@@ -49,11 +49,11 @@ impl<H> Index<usize> for PFB<H> {
 /// [Polyphase Filters](http://www.ws.binghamton.edu/fowler/fowler%20personal%20page/EE521_files/IV-05%20Polyphase%20FIlters%20Revised.pdf)
 ///
 /// [LiquidDSP](https://github.com/jgaeddert/liquid-dsp/blob/b10acc5ab86480ccff4a0743702a082c4fafb4b7/src/filter/src/firpfb.proto.c)
-pub fn decompose<'a, H: 'a, I>(h: I, n: usize) -> Box<[Box<[H]>]>
+pub fn decompose<'a, H, I>(h: I, n: usize) -> Box<[Box<[H]>]>
 where
     I: IntoIterator<Item = &'a H> + Clone + 'a,
     <I as IntoIterator>::IntoIter: ExactSizeIterator,
-    H: Clone + Zero,
+    H: Clone + Zero + 'a,
 {
     assert!(n > 0);
     let padding = match h.clone().into_iter().len() % n {
@@ -62,12 +62,11 @@ where
     };
 
     (0..n)
-        .into_iter()
         .map(|ni| {
             h.clone()
                 .into_iter()
                 .cloned()
-                .chain(std::iter::repeat(H::zero()).take(padding))
+                .chain(std::iter::repeat_n(H::zero(), padding))
                 .skip(ni)
                 .step_by(n)
                 .collect::<Box<[H]>>()
@@ -81,7 +80,7 @@ mod tests {
 
     #[test]
     fn test_decompose() {
-        let h: Vec<i32> = (0..11).into_iter().collect();
+        let h: Vec<i32> = (0..11).collect();
         let subfilters = decompose(&h, 4);
         assert_eq!(
             subfilters,
@@ -97,7 +96,7 @@ mod tests {
 
     #[test]
     fn test_index() {
-        let h: Vec<i32> = (0..11).into_iter().collect();
+        let h: Vec<i32> = (0..11).collect();
         let pfb = PFB::with_taps(&h, 4);
         assert_eq!(pfb[0], [0, 4, 8]);
         assert_eq!(pfb[1], [1, 5, 9]);
@@ -110,7 +109,7 @@ mod tests {
     #[cfg(feature = "serde-derive")]
     fn test_serde() {
         use bincode;
-        let h: Vec<i32> = (0..11).into_iter().collect();
+        let h: Vec<i32> = (0..11).collect();
         let pfb = PFB::with_taps(&h, 4);
         let encoded = bincode::serialize(&pfb).unwrap();
         let decoded: PFB<i32> = bincode::deserialize(&encoded[..]).unwrap();

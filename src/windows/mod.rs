@@ -87,15 +87,15 @@ mod trests {
     fn test_hamming_f32() {
         // Generated from Julia using `DSP.hamming(9)`
         let expected = [
-            0.08000000000000002,
-            0.21473088065418822,
+            0.08,
+            0.214_730_87,
             0.54,
-            0.865269119345812,
+            0.865_269_1,
             1.0,
-            0.865269119345812,
+            0.865_269_1,
             0.54,
-            0.21473088065418822,
-            0.08000000000000002,
+            0.214_730_87,
+            0.08,
         ];
         let taps: Vec<f32> = Hamming.taps(9).collect();
         assert_relative_eq!(taps.as_slice(), expected.as_slice());

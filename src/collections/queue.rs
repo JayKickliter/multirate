@@ -83,14 +83,14 @@ mod tests {
     fn iterate() {
         let mut buf: Queue<i32> = Queue::with_capacity(3);
         assert_eq!(buf.as_slices(), (&[0, 0, 0][..], &[][..]));
-        assert_eq!(buf.iter().map(|&e| e).collect::<Vec<i32>>(), vec![0, 0, 0]);
+        assert_eq!(buf.iter().copied().collect::<Vec<i32>>(), vec![0, 0, 0]);
         assert_eq!(buf.push(1), 0);
-        assert_eq!(buf.iter().map(|&e| e).collect::<Vec<i32>>(), vec![0, 0, 1]);
+        assert_eq!(buf.iter().copied().collect::<Vec<i32>>(), vec![0, 0, 1]);
         assert_eq!(buf.push(2), 0);
-        assert_eq!(buf.iter().map(|&e| e).collect::<Vec<i32>>(), vec![0, 1, 2]);
+        assert_eq!(buf.iter().copied().collect::<Vec<i32>>(), vec![0, 1, 2]);
         assert_eq!(buf.push(3), 0);
-        assert_eq!(buf.iter().map(|&e| e).collect::<Vec<i32>>(), vec![1, 2, 3]);
+        assert_eq!(buf.iter().copied().collect::<Vec<i32>>(), vec![1, 2, 3]);
         assert_eq!(buf.push(4), 1);
-        assert_eq!(buf.iter().map(|&e| e).collect::<Vec<i32>>(), vec![2, 3, 4]);
+        assert_eq!(buf.iter().copied().collect::<Vec<i32>>(), vec![2, 3, 4]);
     }
 }
