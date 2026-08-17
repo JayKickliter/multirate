@@ -1,12 +1,10 @@
-///! This module contains naive and optmimized dot-product routines.
+//! Naive and optimized dot-product routines.
+
 use multiversion::multiversion;
 use num_traits::Zero;
 
 /// Computes the dot-product of two slices `a` and `b`.
-#[multiversion]
-#[clone(target = "[arm,aarch64]+neon")]
-#[clone(target = "x86+sse")]
-#[clone(target = "[x86|x86_64]+avx")]
+#[multiversion(targets = "simd")]
 pub fn dot<A, B, Prod>(a: &[A], b: &[B]) -> Prod
 where
     A: Copy + std::ops::Mul<B, Output = Prod>,

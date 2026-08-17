@@ -1,0 +1,103 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  ci:
+    name: CI
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache | Rust
+        uses: actions/cache@v4
+        with:
+          key: ci-cargo-${{ hashFiles('**/Cargo.toml') }}
+          restore-keys: ci-cargo
+          path: |
+            target/
+            ~/.cargo/bin/
+            ~/.cargo/git/db/
+            ~/.cargo/registry/cache/
+            ~/.cargo/registry/index/
+
+      - name: Install | Rust
+        uses: dtolnay/rust-toolchain@1.93
+        with:
+          components: clippy,rustfmt
+
+      - name: Test | Default Features
+        run: cargo test --all
+
+      - name: Test | All Features
+        run: cargo test --all --all-features
+
+      - name: Check | Documentation
+        run: cargo doc --no-deps --all-features
+        env:
+          RUSTDOCFLAGS: "-D warnings --html-in-header katex-header.html"
+
+      - name: Check | Clippy
+        run: cargo clippy --all-targets --all-features -- -D clippy::all
+
+      - name: Check | Formatting
+        run: cargo fmt --all -- --check
+
+  docs:
+    name: Deploy Documentation
+    needs: ci
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache | Rust
+        uses: actions/cache@v4
+        with:
+          key: docs-cargo-${{ hashFiles('**/Cargo.toml') }}
+          restore-keys: docs-cargo
+          path: |
+            target/
+            ~/.cargo/bin/
+            ~/.cargo/git/db/
+            ~/.cargo/registry/cache/
+            ~/.cargo/registry/index/
+
+      - name: Install | Rust
+        uses: dtolnay/rust-toolchain@1.93
+
+      - name: Build | Documentation
+        run: |
+          cargo doc --no-deps --all-features
+          echo '<meta http-equiv="refresh" content="0; url=multirate/index.html">' > target/doc/index.html
+        env:
+          RUSTDOCFLAGS: "--html-in-header katex-header.html"
+
+      - name: Setup | Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload | Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: "target/doc"
+
+      - name: Deploy | Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

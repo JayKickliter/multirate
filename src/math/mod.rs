@@ -21,7 +21,7 @@ mod tests {
 
     #[test]
     fn test_diff() {
-        let xs: Vec<i32> = (0..5).into_iter().collect();
+        let xs: Vec<i32> = (0..5).collect();
         assert!(itertools::equal(diff(&xs), [1, 1, 1, 1]));
     }
 }
